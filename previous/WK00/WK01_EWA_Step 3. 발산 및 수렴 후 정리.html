@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Translation · Week 0 · Track B</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#EEF0F5;
+  --panel:#FFFFFF;
+  --panel2:#F7F8FB;
+  --line:#D5DAE5;
+  --line2:#E4E7EF;
+  --text:#151A26;
+  --dim:#5F6980;
+  --blue:#2F5BC4;
+  --blue-soft:rgba(47,91,196,.07);
+  --blue-line:rgba(47,91,196,.30);
+  --amber:#9A6A08;
+  --amber-hi:#C98A10;
+  --amber-soft:rgba(201,138,16,.09);
+  --amber-line:rgba(201,138,16,.34);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font);font-weight:400;font-size:16px;line-height:1.75;
+  letter-spacing:-.012em;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 120px;}
+
+.mast{padding:76px 0 36px;border-bottom:1px solid var(--line);}
+.mast h1{font-weight:700;font-size:clamp(30px,6vw,52px);line-height:1.18;margin:0;letter-spacing:-.035em;}
+.mast h1 span{color:var(--dim);font-weight:400;}
+.meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:26px;font-size:13px;color:var(--dim);}
+.meta b{color:var(--text);font-weight:600;}
+
+section{padding:64px 0 0;}
+.eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);display:flex;align-items:center;gap:12px;margin-bottom:14px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+h2{font-weight:700;font-size:clamp(23px,4vw,32px);line-height:1.32;margin:0 0 10px;letter-spacing:-.03em;}
+.lede{color:var(--dim);font-size:15px;margin:0 0 30px;max-width:62ch;}
+.lede b,.node .d b{color:var(--text);font-weight:600;}
+
+.deliver{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:26px 28px;margin:0 0 30px;}
+.deliver .k{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);}
+.deliver .v{font-size:clamp(19px,3.2vw,25px);font-weight:700;letter-spacing:-.03em;line-height:1.4;margin-top:8px;}
+
+.map{display:grid;gap:10px;}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:18px 20px;min-height:118px;display:flex;flex-direction:column;}
+.node .k{font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;}
+.node .v{font-weight:600;font-size:16.5px;margin-top:5px;letter-spacing:-.02em;}
+.node .d{font-size:14px;color:var(--dim);margin-top:7px;line-height:1.65;}
+.node.seed{background:var(--blue-soft);border-color:var(--blue-line);}
+.node.seed .v{color:var(--blue);}
+.node.sketch{background:var(--panel2);}
+.chips{display:flex;gap:6px;margin-top:auto;padding-top:12px;flex-wrap:wrap;}
+.chip{font-size:11.5px;font-weight:600;border:1px solid var(--amber-line);color:var(--amber);background:var(--amber-soft);border-radius:3px;padding:2px 8px;}
+.chip.empty{border-color:var(--line);color:var(--dim);background:transparent;font-weight:400;}
+.arrow{text-align:center;color:#B9C0D0;font-size:15px;line-height:1;}
+.groupbar{display:flex;align-items:center;gap:12px;margin:14px 0 4px;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);}
+.groupbar::after{content:"";flex:1;height:1px;background:var(--line);}
+.limit{font-size:11px;font-weight:500;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:1px 7px;margin-left:7px;white-space:nowrap;vertical-align:2px;letter-spacing:0;}
+
+.note{background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:4px;padding:20px 22px;margin:16px 0 0;}
+.note-head{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;}
+.tag{font-weight:700;font-size:12px;letter-spacing:.08em;background:var(--amber-hi);color:#fff;border-radius:3px;padding:2px 10px;flex:none;}
+.note-head strong{font-weight:700;font-size:15.5px;color:var(--amber);letter-spacing:-.02em;}
+.note p{margin:0 0 10px;font-size:15px;}
+.note p:last-child{margin-bottom:0;}
+.note b{font-weight:600;}
+.note .lever{border-top:1px dashed var(--amber-line);margin-top:14px;padding-top:12px;font-size:14.5px;}
+.note .lever b{color:var(--amber);}
+
+figure{margin:26px 0 0;border:1px solid var(--line);border-radius:4px;background:var(--panel);padding:22px 18px 16px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:13.5px;color:var(--dim);margin-top:14px;padding-top:12px;border-top:1px solid var(--line2);line-height:1.65;}
+
+.axes{margin:18px 0 0;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel);}
+.axes-head{background:var(--panel2);padding:11px 18px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);}
+.axes-body{display:grid;grid-template-columns:1fr;}
+@media(min-width:640px){.axes-body{grid-template-columns:1fr 1fr;}}
+.ax{padding:18px 20px;}
+@media(min-width:640px){.ax:first-child{border-right:1px solid var(--line2);}}
+@media(max-width:639px){.ax+.ax{border-top:1px solid var(--line2);}}
+.ax .t{font-weight:700;font-size:14.5px;margin-bottom:9px;letter-spacing:-.02em;}
+.ax .t span{font-weight:600;font-size:10.5px;color:var(--dim);letter-spacing:.16em;margin-right:9px;}
+.ax ul{margin:0;padding-left:17px;font-size:14px;color:var(--dim);line-height:1.85;}
+
+.five{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0 0;}
+.sq{aspect-ratio:1;border:1px solid var(--amber-line);background:var(--panel);border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:6px;}
+.sq .n{font-size:11px;color:var(--dim);font-weight:600;}
+.sq .w{font-size:11.5px;line-height:1.35;font-weight:500;}
+.sq.free{background:var(--blue-soft);border-color:var(--blue-line);}
+.sq.free .w{color:var(--blue);}
+
+.checks{list-style:none;padding:0;margin:8px 0 0;}
+.checks li{border-bottom:1px solid var(--line);padding:14px 0 14px 30px;position:relative;font-size:15px;}
+.checks li::before{content:"□";position:absolute;left:0;top:13px;color:var(--blue);font-size:15px;}
+.checks li b{font-weight:600;}
+
+.warn{border-left:2px solid var(--amber-hi);padding:2px 0 2px 16px;margin:24px 0 0;font-size:14.5px;color:var(--dim);}
+.warn b{color:var(--amber);font-weight:600;}
+
+footer{margin-top:80px;padding-top:28px;border-top:1px solid var(--line);}
+footer p{font-size:13px;color:var(--dim);margin:0 0 12px;line-height:1.7;}
+footer .src{font-size:12px;color:var(--dim);line-height:2.1;}
+footer .src span{color:var(--text);font-weight:600;}
+
+@media (prefers-reduced-motion:no-preference){
+  section,.mast{animation:rise .45s ease-out both;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <h1>Visual Translation<br><span>·</span> Week 0 <span>·</span> Track B</h1>
+  <div class="meta">
+    <span>마감 <b>2026-09-08 23:59</b></span>
+    <span>팀 <b>2인 (Graphic Maker + Image Maker)</b></span>
+    <span>제출 <b>1 Pager + 스케치</b></span>
+  </div>
+</header>
+
+<!-- 00 -->
+<section>
+  <div class="eyebrow">00 — 전체 구조</div>
+  <h2>무엇을 만드는가</h2>
+
+  <div class="deliver">
+    <div class="k">최종 산출물</div>
+    <div class="v">6곡을 한 장으로 묶는 컴필레이션 앨범 커버 디자인</div>
+  </div>
+
+  <p class="lede">두 사람이 하나의 콘셉트를 <b>공동으로</b> 세우고, 시각언어만 나눠 작업한 뒤 다시 하나로 결합합니다. 갈라지는 건 역할이지 콘셉트가 아닙니다. 장르 제한은 없지만, 그 대신 <b>왜 이 6곡이 한 장인가</b>를 팀이 전부 증명해야 합니다.</p>
+
+  <div class="map">
+    <div class="node seed">
+      <div class="k">Seed</div>
+      <div class="v">6곡 선정 + 청취 맥락</div>
+      <div class="d">누가 · 언제 · 어디서 듣는가. 곡을 고르는 일이 곧 저작입니다.</div>
+    </div>
+
+    <div class="groupbar">1 Pager — 팀 공동</div>
+
+    <div class="node">
+      <div class="k">1)</div>
+      <div class="v">콘셉트 기획 <span class="limit">≤500자</span></div>
+      <div class="d">내부 브리프. 제3자가 읽고 비슷한 곡을 떠올릴 수 있을 만큼 구체적으로.</div>
+      <div class="chips"><span class="chip">A 두 경로</span><span class="chip">B 조준</span></div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node">
+      <div class="k">2)</div>
+      <div class="v">앨범 제목 / 소개 <span class="limit">≤500자</span></div>
+      <div class="d">외부 카피. 아직 안 들은 사람 대상. 1)의 반복 금지, 곡 나열 금지.</div>
+      <div class="chips"><span class="chip empty">미정 — 이미지와의 역할 분담</span></div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node">
+      <div class="k">3)</div>
+      <div class="v">시각화 키워드 3–5개</div>
+      <div class="d">이미지 후보를 채택·기각하는 기준. 안 붙으면 기획 쪽을 고칩니다.</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node">
+      <div class="k">4)</div>
+      <div class="v">의사결정 및 토론 요약 <span class="limit">자유 분량</span></div>
+      <div class="d">1)–3) 전 과정에 걸쳐 기록. 기각한 대안과 그 이유, 의견이 갈린 지점, 아직 유보한 쟁점.</div>
+    </div>
+
+    <div class="groupbar">스케치 — Track B 개인</div>
+
+    <div class="node sketch">
+      <div class="k">개인 제출</div>
+      <div class="v">스케치 15–25장 (키워드당 ≥5장)</div>
+      <div class="d">핸드 드로잉. 러프해도 무방. 인물 · 사물 · 자연물 · 추상 모두 가능.</div>
+      <div class="chips"><span class="chip">C 범주축 × 변형축</span></div>
+    </div>
+  </div>
+
+  <div class="warn"><b>흔한 실패</b> — 콘셉트를 대충 합의하고 각자 작업한 뒤 마지막에 합치는 순서. 이러면 조율 대상이 시각언어가 아니라 서로 다른 두 콘셉트가 되고, 커버는 절충안이 됩니다.</div>
+</section>
+
+<!-- A -->
+<section>
+  <div class="eyebrow">A — 콘셉트 기획</div>
+  <h2>음악과 이미지를 잇는 길은 두 개다</h2>
+  <p class="lede">두 경로는 같은 층위에 나란히 있고, 각각 양방향으로 통합니다. 곡을 들으면 이미지가 떠오르고 이미지를 보면 곡이 떠오르는 <b>왕복</b>이 목표이므로, 어느 경로가 우월한지가 아니라 <b>둘이 같은 곳을 가리키는지</b>가 기획의 핵심입니다.</p>
+
+  <figure>
+    <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="음악과 이미지가 정서 경로와 문화 경로를 통해 양방향으로 연결되는 구조">
+      <defs>
+        <marker id="my" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#C98A10"/></marker>
+        <marker id="my2" markerWidth="9" markerHeight="9" refX="2" refY="4.5" orient="auto"><path d="M8,1 L0,4.5 L8,8 z" fill="#C98A10"/></marker>
+        <marker id="mb" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#2F5BC4"/></marker>
+        <marker id="mb2" markerWidth="9" markerHeight="9" refX="2" refY="4.5" orient="auto"><path d="M8,1 L0,4.5 L8,8 z" fill="#2F5BC4"/></marker>
+      </defs>
+      <g font-family="Pretendard, sans-serif">
+        <rect x="14" y="112" width="130" height="76" rx="4" fill="#F7F8FB" stroke="#D5DAE5"/>
+        <text x="79" y="145" text-anchor="middle" fill="#151A26" font-size="18" font-weight="600">음악</text>
+        <text x="79" y="167" text-anchor="middle" fill="#5F6980" font-size="12">6곡</text>
+
+        <rect x="496" y="112" width="130" height="76" rx="4" fill="#F7F8FB" stroke="#D5DAE5"/>
+        <text x="561" y="145" text-anchor="middle" fill="#151A26" font-size="18" font-weight="600">이미지</text>
+        <text x="561" y="167" text-anchor="middle" fill="#5F6980" font-size="12">커버 1장</text>
+
+        <rect x="252" y="28" width="136" height="60" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+        <text x="320" y="55" text-anchor="middle" fill="#9A6A08" font-size="15" font-weight="600">정서</text>
+        <text x="320" y="75" text-anchor="middle" fill="#5F6980" font-size="11.5">곡을 몰라도 통함</text>
+        <path d="M148,126 C196,124 202,58 247,58" stroke="#C98A10" stroke-width="1.6" fill="none" marker-end="url(#my)" marker-start="url(#my2)"/>
+        <path d="M393,58 C438,58 444,124 492,126" stroke="#C98A10" stroke-width="1.6" fill="none" marker-end="url(#my)" marker-start="url(#my2)"/>
+
+        <rect x="252" y="212" width="136" height="60" rx="4" fill="rgba(47,91,196,.08)" stroke="rgba(47,91,196,.35)"/>
+        <text x="320" y="239" text-anchor="middle" fill="#2F5BC4" font-size="15" font-weight="600">문화</text>
+        <text x="320" y="259" text-anchor="middle" fill="#5F6980" font-size="11.5">얼마나 통상적으로 쓰이는가</text>
+        <path d="M148,174 C196,176 202,242 247,242" stroke="#2F5BC4" stroke-width="1.6" fill="none" marker-end="url(#mb)" marker-start="url(#mb2)"/>
+        <path d="M393,242 C438,242 444,176 492,174" stroke="#2F5BC4" stroke-width="1.6" fill="none" marker-end="url(#mb)" marker-start="url(#mb2)"/>
+
+        <text x="320" y="155" text-anchor="middle" fill="#8B93A6" font-size="11" font-weight="600" letter-spacing="1.6">BOTH WAYS</text>
+      </g>
+    </svg>
+    <figcaption>정서 경로는 사람이 음악을 듣고 색을 고른 실험에서, 문화 경로는 기계가 커버·프로모션 이미지의 색과 텍스처만으로 장르를 맞춘 연구에서 각각 확인된 길입니다. 위아래는 위계가 아니라 서로 다른 재료이고, 각각 양쪽으로 오갑니다.</figcaption>
+  </figure>
+
+  <div class="note">
+    <div class="note-head"><span class="tag">A</span><strong>정서와 문화가 겹치는 자리를 찾는다</strong></div>
+    <p><b>정서</b>는 음악의 정서와 이미지의 정서가 맞물리는 길입니다. 그 곡을 몰라도 통합니다.</p>
+    <p><b>문화</b>는 그 소재가 그 음악과 함께 쓰이는 것이 사람들에게 얼마나 통상적인가입니다. 이미지 쪽 재료는 사물 · 인물 · 분위기 · 타이포그래피 · 효과, 음악 쪽 재료는 가사와 주제 · 음정과 템포입니다.</p>
+    <p class="lever">둘은 위아래가 아니라 나란한 두 축입니다. <b>어긋나면 신호가 흩어지고, 겹치면 세집니다.</b> 기획문의 각 문장이 어느 축을 쓰고 있는지 표시해보면 겹침이 보입니다.</p>
+  </div>
+</section>
+
+</section>
+
+<!-- B -->
+<section>
+  <div class="eyebrow">B — 조준</div>
+  <h2>클리셰를 정확히 노린다</h2>
+  <p class="lede">이 커버의 성공 조건은 남과 다른 것이 아니라 <b>왕복이 되는 것</b>입니다. 곡을 들으면 이 이미지가 떠오르고, 이미지를 보면 그 곡이 떠오르는 것. 그러려면 공유된 코드를 정확히 맞춰야 합니다. 세 힘이 한 방향으로 수렴하는 건 실패가 아니라 <b>신호가 세다</b>는 뜻입니다.</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="음향 신호, 소재와 가사, 문화 코드 세 힘이 수렴해 하나의 강한 신호가 되고, 그 신호가 장르를 가리키는지 이 앨범을 가리키는지 갈리는 구조">
+      <defs>
+        <marker id="ad" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#8B93A6"/></marker>
+        <marker id="ae" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#2F5BC4"/></marker>
+        <marker id="af" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#C98A10"/></marker>
+      </defs>
+      <g font-family="Pretendard, sans-serif">
+        <rect x="8" y="18" width="150" height="50" rx="4" fill="#F7F8FB" stroke="#D5DAE5"/>
+        <text x="83" y="40" text-anchor="middle" fill="#151A26" font-size="13.5" font-weight="600">음향 신호</text>
+        <text x="83" y="58" text-anchor="middle" fill="#5F6980" font-size="11">템포 · 조성</text>
+
+        <rect x="8" y="100" width="150" height="50" rx="4" fill="#F7F8FB" stroke="#D5DAE5"/>
+        <text x="83" y="122" text-anchor="middle" fill="#151A26" font-size="13.5" font-weight="600">소재 · 가사</text>
+        <text x="83" y="140" text-anchor="middle" fill="#5F6980" font-size="11">무엇을 말하는 음악인가</text>
+
+        <rect x="8" y="182" width="150" height="50" rx="4" fill="#F7F8FB" stroke="#D5DAE5"/>
+        <text x="83" y="204" text-anchor="middle" fill="#151A26" font-size="13.5" font-weight="600">문화 코드</text>
+        <text x="83" y="222" text-anchor="middle" fill="#5F6980" font-size="11">그 음악이 늘 쓰던 시각언어</text>
+
+        <path d="M162,43 C226,43 226,120 274,124" stroke="#8B93A6" stroke-width="1.4" fill="none" marker-end="url(#ad)"/>
+        <path d="M162,125 L274,125" stroke="#8B93A6" stroke-width="1.4" fill="none" marker-end="url(#ad)"/>
+        <path d="M162,207 C226,207 226,130 274,126" stroke="#8B93A6" stroke-width="1.4" fill="none" marker-end="url(#ad)"/>
+
+        <rect x="284" y="98" width="118" height="54" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+        <text x="343" y="121" text-anchor="middle" fill="#9A6A08" font-size="14" font-weight="600">강한 신호</text>
+        <text x="343" y="140" text-anchor="middle" fill="#5F6980" font-size="11">= 왕복이 되는 상태</text>
+
+        <path d="M406,118 C440,118 448,58 486,56" stroke="#C98A10" stroke-width="1.5" fill="none" marker-end="url(#af)"/>
+        <path d="M406,132 C440,132 448,192 486,194" stroke="#2F5BC4" stroke-width="1.6" fill="none" marker-end="url(#ae)"/>
+
+        <rect x="492" y="28" width="140" height="56" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+        <text x="562" y="51" text-anchor="middle" fill="#9A6A08" font-size="13" font-weight="600">장르를 가리킴</text>
+        <text x="562" y="70" text-anchor="middle" fill="#9A6A08" font-size="11">성공</text>
+
+        <rect x="492" y="166" width="140" height="56" rx="4" fill="rgba(47,91,196,.08)" stroke="rgba(47,91,196,.35)"/>
+        <text x="562" y="189" text-anchor="middle" fill="#2F5BC4" font-size="13" font-weight="600">이 6곡을 가리킴</text>
+        <text x="562" y="208" text-anchor="middle" fill="#2F5BC4" font-size="11">더 좋은 결과</text>
+
+        <text x="449" y="132" text-anchor="middle" fill="#5F6980" font-size="10.5" font-weight="600" letter-spacing="1.2">청취 맥락</text>
+      </g>
+    </svg>
+    <figcaption>수렴은 그 자체로 성과입니다. 위쪽도 성공이고, 아래쪽은 같은 신호가 더 좁은 대상까지 짚은 상태입니다. 둘을 가르는 건 청취 맥락의 해상도입니다.</figcaption>
+  </figure>
+
+  <div class="note">
+    <div class="note-head"><span class="tag">B</span><strong>남달라야 하는 게 아니라 정확해야 한다</strong></div>
+    <p>기존 코드를 쓰는 것과 기존 커버를 복사하는 것은 다릅니다. 코드는 정확히 맞추는 게 맞고, 세 힘이 한 방향이면 조준이 잘된 것입니다.</p>
+    <p>여기서 한 단계가 더 있습니다. 같은 코드를 쓰더라도 <b>청취 맥락이 구체적이면 지시 대상이 장르에서 이 6곡 쪽으로 내려옵니다.</b> 장르를 맞추는 것도 성공이고, 앨범까지 짚으면 더 좋은 결과입니다.</p>
+    <p class="lever"><b>자가 검증</b> — 기획문만 팀 밖 사람에게 보여주고 곡 5개를 추천받습니다. 한 곡도 안 겹치면 조준이 빗나간 것, 전부 겹치면 장르까지 맞춘 것. <b>2–3곡</b>이면 앨범 쪽까지 내려온 상태입니다.</p>
+  </div>
+
+  <div class="warn"><b>글자수의 함정</b> — 500자는 상한입니다. 형용사를 늘어놓으면 500자는 쉽게 차지만 지시 대상은 넓어지기만 합니다. 형용사 하나를 지우고 구체적 상황 한 줄을 넣는 교환이 계속 이득입니다.</div>
+</section>
+
+<!-- C -->
+<section>
+  <div class="eyebrow">C — 스케치 전용</div>
+  <h2>범주 축 × 변형 축</h2>
+  <p class="lede">1 Pager에는 쓰지 않습니다. 스케치 15–25장을 그릴 때만 쓰는 생성 도구입니다. 범주 축은 <b>무엇을 그릴까</b>, 변형 축은 <b>그걸 어떻게 비틀까</b>이고, 두 축은 곱해집니다.</p>
+
+  <div class="axes">
+    <div class="axes-head">두 축</div>
+    <div class="axes-body">
+      <div class="ax">
+        <div class="t"><span>AXIS 1</span>범주 — 무엇을</div>
+        <ul><li>인물</li><li>사물</li><li>자연물</li><li>추상</li></ul>
+      </div>
+      <div class="ax">
+        <div class="t"><span>AXIS 2</span>변형 — 어떻게</div>
+        <ul>
+          <li>거리 — 극단 클로즈업 ↔ 사라질 만큼 먼 원경</li>
+          <li>프레임 — 화면 밖으로 밀어내기, 잘라내기</li>
+          <li>수량 — 하나만 남기기 ↔ 반복·배열</li>
+          <li>부재 — 대상을 빼고 자리·흔적만</li>
+          <li>시간 — 직전 / 직후 / 잔상만</li>
+          <li>상태 — 젖음 · 마모 · 미완성 · 파손</li>
+          <li>매체 — 실물 → 인쇄물 → 화면 → 재촬영</li>
+          <li>광원 — 역광 · 단일 광원 · 과다노출 · 소등</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-head"><span class="tag">C</span><strong>5장 배분 규칙</strong></div>
+    <p>1장은 떠오르는 대로 자유롭게, 나머지 4장은 그 1장에 <b>서로 다른 변형축을 강제 적용</b>합니다. 변주는 같은 축 위의 이동이라, 이 절차에서는 "첫 장의 변주 4장"이 구조적으로 불가능해집니다.</p>
+    <div class="five">
+      <div class="sq free"><span class="n">01</span><span class="w">자유</span></div>
+      <div class="sq"><span class="n">02</span><span class="w">변형축 ①</span></div>
+      <div class="sq"><span class="n">03</span><span class="w">변형축 ②</span></div>
+      <div class="sq"><span class="n">04</span><span class="w">변형축 ③</span></div>
+      <div class="sq"><span class="n">05</span><span class="w">변형축 ④</span></div>
+    </div>
+    <p class="lever">예 — 01이 인물 클로즈업이면, 02는 <b>부재</b>(인물 빼고 흔적만), 03은 <b>매체</b>(그 장면을 찍은 인화지를 다시 찍기), 04는 <b>시간</b>(직후), 05는 <b>수량</b>(같은 인물 반복 배열).</p>
+  </div>
+
+  <div class="warn"><b>레퍼런스를 지금 열지 않는 이유</b> — 기존 코드를 조준하는 것과 특정 이미지를 참고하는 것은 다릅니다. 예시의 결함을 명시적으로 알려줘도 후속 아이디어가 그 특징을 복제한다는 것이 반복 재현된 실험 결과이고, 그렇게 나온 커버는 코드가 아니라 <b>그 한 장</b>을 가리키게 됩니다. 레퍼런스는 스케치가 끝난 뒤 고르고 다듬는 단계에서 엽니다.</div>
+</section>
+
+<!-- 99 -->
+<section>
+  <div class="eyebrow">99 — 제출 전 점검</div>
+  <h2>왕복이 되는가</h2>
+  <ul class="checks">
+    <li>커버를 보고 <b>6곡 중 몇 곡</b>이 떠오르는가 — 대표곡 한둘만이면 나머지는 그냥 붙어 있는 것</li>
+    <li>기획문만 읽고 추천받은 곡이 <b>2–3곡</b> 겹치는가 — 0곡이면 빗나간 것, 전부면 장르에 머문 것</li>
+    <li>이 커버에 <b>다른 앨범 제목</b>을 얹어도 성립하는가 — 성립하면 장르까지 짚은 것, 안 되면 이 앨범까지 내려온 것</li>
+    <li>소개문에서 곡 제목과 아티스트를 지워도 문장이 서는가 — 나열이 아니라 <b>상위 전제</b>인가</li>
+    <li>키워드로 이미지 후보를 <b>탈락시킬 수</b> 있는가 — 기준으로 기능하는가</li>
+    <li>의사결정 요약에 <b>기각된 안과 그 이유</b>가 있는가 — 시간순이 아니라 쟁점 단위인가</li>
+    <li>스케치가 키워드 × 5장을 채우되 <b>같은 아이디어의 변주</b>가 아닌가</li>
+    <li>1 Pager가 두 사람 모두에게 판단 근거로 쓰이는가 — 한 사람의 문서가 아닌가</li>
+  </ul>
+  <div class="warn"><b>통제 가능한 목표</b> — 키워드 3개면 15장, 5개면 25장. 하루 몇 장씩 나눌지가 곧 작업설계이고, 이때 세울 수 있는 목표는 "좋은 스케치"가 아니라 <b>"n장"</b>입니다.</div>
+</section>
+
+<footer>
+  <p>과제 지시문은 요지만 남기고 압축했습니다. 원문 표현이 필요한 항목은 배포본을 확인하세요.</p>
+  <p class="src">
+    <span>A</span> &nbsp;&nbsp;&nbsp;Palmer, Schloss, Xu &amp; Prado-León, "Music–color associations are mediated by emotion", <i>PNAS</i> 110(22), 2013<br>
+    <span>A</span> &nbsp;&nbsp;&nbsp;Lībeks &amp; Turnbull, "You Can Judge an Artist by an Album Cover", <i>IEEE MultiMedia</i> 18(4), 2011<br>
+    <span>C</span> &nbsp;&nbsp;&nbsp;Yilmaz, Daly, Seifert &amp; Gonzalez, "Evidence-based design heuristics for idea generation", <i>Design Studies</i>, 2016<br>
+    <span>C</span> &nbsp;&nbsp;&nbsp;Jansson &amp; Smith, "Design fixation", <i>Design Studies</i> 12(1), 1991
+  </p>
+</footer>
+
+</div>
+</body>
+</html>

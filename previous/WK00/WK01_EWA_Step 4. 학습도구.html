@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VT 재인출 카드 — 정서·문화 / 조준</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#EEF0F5;--panel:#FFFFFF;--panel2:#F7F8FB;
+  --line:#D5DAE5;--line2:#E4E7EF;
+  --text:#151A26;--dim:#5F6980;
+  --blue:#2F5BC4;--blue-soft:rgba(47,91,196,.07);--blue-line:rgba(47,91,196,.30);
+  --amber:#9A6A08;--amber-hi:#C98A10;--amber-soft:rgba(201,138,16,.09);--amber-line:rgba(201,138,16,.34);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);
+  font-weight:400;font-size:16px;line-height:1.7;letter-spacing:-.012em;}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 80px;}
+
+header{padding:54px 0 22px;}
+header h1{font-size:clamp(22px,4.6vw,30px);font-weight:700;letter-spacing:-.035em;margin:0;line-height:1.3;}
+header p{color:var(--dim);font-size:14px;margin:10px 0 0;}
+
+/* progress */
+.rail{display:flex;gap:5px;margin:22px 0 16px;}
+.pip{flex:1;height:3px;background:var(--line);border-radius:2px;transition:background .2s;}
+.pip.done{background:var(--blue);}
+.pip.now{background:var(--amber-hi);}
+
+/* card */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  padding:26px 24px 24px;box-shadow:0 1px 2px rgba(20,30,60,.04);}
+.kind{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:3px;padding:3px 9px;}
+.badge.a{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-line);}
+.badge.b{background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue-line);}
+.kindname{font-size:11.5px;font-weight:600;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;}
+.count{margin-left:auto;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;}
+
+.q{font-size:18px;font-weight:600;letter-spacing:-.025em;line-height:1.55;margin:0 0 6px;}
+.qsub{font-size:14px;color:var(--dim);margin:0;}
+
+figure{margin:20px 0 0;background:var(--panel2);border:1px solid var(--line2);
+  border-radius:5px;padding:18px 14px;}
+figure svg{display:block;width:100%;height:auto;}
+.ans{opacity:0;transition:opacity .25s ease;}
+.ph{opacity:1;transition:opacity .2s ease;}
+.card.revealed .ans{opacity:1;}
+.card.revealed .ph{opacity:0;}
+
+.back{display:none;margin-top:22px;padding-top:20px;border-top:1px dashed var(--line);}
+.card.revealed .back{display:block;animation:fade .28s ease-out both;}
+@keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.back h3{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);margin:0 0 12px;}
+.back p{font-size:15px;margin:0 0 11px;}
+.back p:last-child{margin-bottom:0;}
+.back b{font-weight:600;}
+.back .hl{color:var(--amber);font-weight:600;}
+.back .hlb{color:var(--blue);font-weight:600;}
+.pair{display:grid;gap:10px;margin:0 0 12px;}
+@media(min-width:560px){.pair{grid-template-columns:1fr 1fr;}}
+.pcell{border:1px solid var(--line);border-radius:4px;padding:13px 15px;background:var(--panel2);}
+.pcell .t{font-size:12.5px;font-weight:700;letter-spacing:.02em;margin-bottom:5px;}
+.pcell .d{font-size:13.5px;color:var(--dim);line-height:1.6;}
+.pcell.am{border-color:var(--amber-line);background:var(--amber-soft);}
+.pcell.am .t{color:var(--amber);}
+.pcell.bl{border-color:var(--blue-line);background:var(--blue-soft);}
+.pcell.bl .t{color:var(--blue);}
+
+/* actions */
+.acts{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;}
+button{font-family:inherit;font-size:14px;font-weight:600;letter-spacing:-.01em;
+  border-radius:5px;padding:11px 18px;cursor:pointer;border:1px solid var(--line);
+  background:var(--panel);color:var(--text);transition:background .15s,border-color .15s;}
+button:hover{background:var(--panel2);}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+.reveal{background:var(--text);color:#fff;border-color:var(--text);flex:1;}
+.reveal:hover{background:#28304a;}
+.rate{display:none;gap:8px;margin-top:16px;flex-wrap:wrap;}
+.card.revealed ~ .rate{display:flex;}
+.rate button{flex:1;min-width:96px;}
+.rate .r0{border-color:var(--amber-line);color:var(--amber);}
+.rate .r2{border-color:var(--blue-line);color:var(--blue);}
+.hint{font-size:12.5px;color:var(--dim);margin-top:12px;text-align:center;}
+
+/* summary */
+.summary{display:none;background:var(--panel);border:1px solid var(--line);
+  border-radius:6px;padding:28px 24px;}
+.summary.on{display:block;}
+.summary h2{font-size:20px;font-weight:700;letter-spacing:-.03em;margin:0 0 14px;}
+.summary ul{margin:0 0 18px;padding-left:18px;font-size:15px;color:var(--dim);line-height:1.9;}
+.summary ul b{color:var(--text);font-weight:600;}
+.plan{border:1px solid var(--amber-line);background:var(--amber-soft);border-radius:5px;
+  padding:15px 17px;font-size:14px;margin-bottom:18px;}
+.plan b{color:var(--amber);font-weight:700;}
+
+/* intent */
+.intent{margin-top:36px;border-top:1px solid var(--line);padding-top:22px;}
+.intent summary{font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;letter-spacing:-.01em;}
+.intent p{font-size:13.5px;color:var(--dim);line-height:1.75;margin:12px 0 0;}
+.intent b{color:var(--text);font-weight:600;}
+
+
+/* ---- response ---- */
+.resp{margin:20px 0 0;}
+.resplab{font-size:11.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;}
+.blank{display:grid;grid-template-columns:minmax(88px,auto) 1fr;align-items:center;gap:12px;margin-bottom:9px;}
+.blank .bl{font-size:13.5px;color:var(--dim);}
+.blank input{font-family:inherit;font-size:15px;font-weight:500;color:var(--text);
+  border:1px solid var(--line);border-radius:5px;padding:10px 13px;width:100%;background:var(--panel2);
+  transition:border-color .15s,background .15s;}
+.blank input:focus{outline:none;border-color:var(--blue);background:#fff;}
+.blank input:disabled{opacity:1;}
+.blank.ok input{border-color:var(--blue-line);background:var(--blue-soft);}
+.blank.no input{border-color:var(--amber-line);background:var(--amber-soft);}
+.mark{font-size:13px;font-weight:700;margin-left:2px;}
+.mark.ok{color:var(--blue);}
+.mark.no{color:var(--amber);}
+.blank .with{display:flex;align-items:center;gap:8px;}
+
+.opts{display:grid;gap:8px;}
+.opt{text-align:left;font-weight:500;font-size:14.5px;line-height:1.5;padding:13px 16px;
+  border:1px solid var(--line);border-radius:5px;background:var(--panel2);cursor:pointer;
+  color:var(--text);font-family:inherit;transition:border-color .15s,background .15s;}
+.opt:hover{background:#fff;border-color:#B9C2D6;}
+.opt.sel{border-color:var(--blue);background:var(--blue-soft);}
+.opt.right{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:600;}
+.opt.wrong{border-color:var(--amber-line);background:var(--amber-soft);color:var(--amber);}
+.opt:disabled{cursor:default;}
+
+.mrow{display:grid;grid-template-columns:minmax(64px,auto) 1fr;align-items:center;gap:12px;margin-bottom:8px;}
+.mrow .ml{font-size:14px;font-weight:600;}
+.mopts{display:flex;gap:6px;flex-wrap:wrap;}
+.mopt{font-size:13px;font-weight:500;padding:8px 12px;border:1px solid var(--line);border-radius:5px;
+  background:var(--panel2);cursor:pointer;font-family:inherit;color:var(--text);}
+.mopt:hover{background:#fff;}
+.mopt.sel{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:600;}
+.mopt.right{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:700;}
+.mopt.wrong{border-color:var(--amber-line);background:var(--amber-soft);color:var(--amber);}
+.mopt:disabled{cursor:default;}
+
+textarea{font-family:inherit;font-size:15px;color:var(--text);border:1px solid var(--line);
+  border-radius:5px;padding:12px 14px;width:100%;background:var(--panel2);resize:vertical;min-height:74px;
+  line-height:1.6;}
+textarea:focus{outline:none;border-color:var(--blue);background:#fff;}
+.nudge{font-size:12.5px;color:var(--amber);margin-top:10px;display:none;}
+.nudge.on{display:block;}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>정서 · 문화 / 조준</h1>
+  <p>Visual Translation Week 0 — 재인출 카드 6장. 답을 보기 전에 소리 내서 먼저 말해봅니다.</p>
+</header>
+
+<div class="rail" id="rail"></div>
+<div id="stage"></div>
+<div class="rate" id="rate">
+  <button class="r0" onclick="rate(0)">막혔다</button>
+  <button class="r1" onclick="rate(1)">겨우 나왔다</button>
+  <button class="r2" onclick="rate(2)">술술 나왔다</button>
+</div>
+<p class="hint" id="hint">Enter · 답 확인 &nbsp;/&nbsp; 1 2 3 · 채점</p>
+
+<div class="summary" id="summary"></div>
+
+<details class="intent">
+  <summary>이 도구를 이렇게 만든 이유</summary>
+  <p>다이어그램을 완성된 채로 보여주면 읽고 끄덕이는 것으로 끝납니다. 그래서 <b>라벨을 지운 상태로 먼저 띄우고</b>, 빈칸을 직접 채우거나 보기를 고른 뒤에야 정답이 드러나게 했습니다. 아무것도 입력하지 않으면 답 확인이 막히는 것도 같은 이유입니다 — 시도한 뒤에 봐야 남습니다.</p>
+  <p>카드는 세 종류입니다. <b>구조 복원</b>은 다이어그램을 다시 세울 수 있는지, <b>판정</b>은 처음 보는 사례를 두 축으로 가를 수 있는지, <b>적용</b>은 지금 듣는 곡에 직접 걸어볼 수 있는지를 봅니다. 셋째가 없으면 개념이 이 과제 밖으로 나가지 못합니다.</p>
+  <p>6장으로 끊은 것도 의도입니다. 이번 주에 가져갈 것은 <b>A(두 축)</b>와 <b>B(조준)</b> 둘뿐이고, 나머지는 문서에 남겨뒀습니다. 채점 결과는 저장되지 않습니다 — 끝나면 다시 볼 카드 번호만 알려주니 그것만 메모해두면 됩니다.</p>
+</details>
+
+</div>
+
+<script>
+const SVG_A = `
+<svg viewBox="0 0 620 290" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, sans-serif">
+ <defs>
+  <marker id="ay" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#C98A10"/></marker>
+  <marker id="ay2" markerWidth="9" markerHeight="9" refX="2" refY="4.5" orient="auto"><path d="M8,1 L0,4.5 L8,8 z" fill="#C98A10"/></marker>
+  <marker id="ab" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#2F5BC4"/></marker>
+  <marker id="ab2" markerWidth="9" markerHeight="9" refX="2" refY="4.5" orient="auto"><path d="M8,1 L0,4.5 L8,8 z" fill="#2F5BC4"/></marker>
+ </defs>
+ <rect x="10" y="108" width="120" height="72" rx="4" fill="#FFFFFF" stroke="#D5DAE5"/>
+ <text x="70" y="140" text-anchor="middle" fill="#151A26" font-size="17" font-weight="600">음악</text>
+ <text x="70" y="161" text-anchor="middle" fill="#5F6980" font-size="11.5">6곡</text>
+
+ <rect x="490" y="108" width="120" height="72" rx="4" fill="#FFFFFF" stroke="#D5DAE5"/>
+ <text x="550" y="140" text-anchor="middle" fill="#151A26" font-size="17" font-weight="600">이미지</text>
+ <text x="550" y="161" text-anchor="middle" fill="#5F6980" font-size="11.5">커버 1장</text>
+
+ <rect x="242" y="26" width="136" height="60" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+ <text class="ph" x="310" y="63" text-anchor="middle" fill="#B98C2E" font-size="24" font-weight="700">?</text>
+ <text class="ans" x="310" y="53" text-anchor="middle" fill="#9A6A08" font-size="15" font-weight="600">정서</text>
+ <text class="ans" x="310" y="73" text-anchor="middle" fill="#5F6980" font-size="11">곡을 몰라도 통함</text>
+ <path d="M134,122 C186,120 192,56 237,56" stroke="#C98A10" stroke-width="1.6" fill="none" marker-end="url(#ay)" marker-start="url(#ay2)"/>
+ <path d="M383,56 C428,56 434,120 486,122" stroke="#C98A10" stroke-width="1.6" fill="none" marker-end="url(#ay)" marker-start="url(#ay2)"/>
+
+ <rect x="242" y="202" width="136" height="60" rx="4" fill="rgba(47,91,196,.08)" stroke="rgba(47,91,196,.35)"/>
+ <text class="ph" x="310" y="239" text-anchor="middle" fill="#6C8AD4" font-size="24" font-weight="700">?</text>
+ <text class="ans" x="310" y="229" text-anchor="middle" fill="#2F5BC4" font-size="15" font-weight="600">문화</text>
+ <text class="ans" x="310" y="249" text-anchor="middle" fill="#5F6980" font-size="11">얼마나 통상적으로 쓰이는가</text>
+ <path d="M134,166 C186,168 192,232 237,232" stroke="#2F5BC4" stroke-width="1.6" fill="none" marker-end="url(#ab)" marker-start="url(#ab2)"/>
+ <path d="M383,232 C428,232 434,168 486,166" stroke="#2F5BC4" stroke-width="1.6" fill="none" marker-end="url(#ab)" marker-start="url(#ab2)"/>
+
+ <text class="ans" x="310" y="149" text-anchor="middle" fill="#8B93A6" font-size="10.5" font-weight="600" letter-spacing="1.5">BOTH WAYS</text>
+</svg>`;
+
+const SVG_B = `
+<svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, sans-serif">
+ <defs>
+  <marker id="g" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#8B93A6"/></marker>
+  <marker id="am" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#C98A10"/></marker>
+  <marker id="bl" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,1 L8,4.5 L0,8 z" fill="#2F5BC4"/></marker>
+ </defs>
+ <rect x="6" y="14" width="146" height="48" rx="4" fill="#FFFFFF" stroke="#D5DAE5"/>
+ <text class="ph" x="79" y="45" text-anchor="middle" fill="#9AA3B5" font-size="20" font-weight="700">?</text>
+ <text class="ans" x="79" y="36" text-anchor="middle" fill="#151A26" font-size="13" font-weight="600">음향 신호</text>
+ <text class="ans" x="79" y="53" text-anchor="middle" fill="#5F6980" font-size="10.5">템포 · 조성</text>
+
+ <rect x="6" y="94" width="146" height="48" rx="4" fill="#FFFFFF" stroke="#D5DAE5"/>
+ <text class="ph" x="79" y="125" text-anchor="middle" fill="#9AA3B5" font-size="20" font-weight="700">?</text>
+ <text class="ans" x="79" y="116" text-anchor="middle" fill="#151A26" font-size="13" font-weight="600">소재 · 가사</text>
+ <text class="ans" x="79" y="133" text-anchor="middle" fill="#5F6980" font-size="10.5">무엇을 말하는 음악인가</text>
+
+ <rect x="6" y="174" width="146" height="48" rx="4" fill="#FFFFFF" stroke="#D5DAE5"/>
+ <text class="ph" x="79" y="205" text-anchor="middle" fill="#9AA3B5" font-size="20" font-weight="700">?</text>
+ <text class="ans" x="79" y="196" text-anchor="middle" fill="#151A26" font-size="13" font-weight="600">문화 코드</text>
+ <text class="ans" x="79" y="213" text-anchor="middle" fill="#5F6980" font-size="10.5">늘 함께 쓰이던 시각언어</text>
+
+ <path d="M156,38 C216,38 216,114 262,118" stroke="#8B93A6" stroke-width="1.3" fill="none" marker-end="url(#g)"/>
+ <path d="M156,118 L262,119" stroke="#8B93A6" stroke-width="1.3" fill="none" marker-end="url(#g)"/>
+ <path d="M156,198 C216,198 216,124 262,120" stroke="#8B93A6" stroke-width="1.3" fill="none" marker-end="url(#g)"/>
+
+ <rect x="272" y="92" width="116" height="52" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+ <text class="ph" x="330" y="126" text-anchor="middle" fill="#B98C2E" font-size="22" font-weight="700">?</text>
+ <text class="ans" x="330" y="114" text-anchor="middle" fill="#9A6A08" font-size="13.5" font-weight="600">강한 신호</text>
+ <text class="ans" x="330" y="132" text-anchor="middle" fill="#5F6980" font-size="10.5">= 왕복이 되는 상태</text>
+
+ <path d="M392,112 C426,112 434,54 472,52" stroke="#C98A10" stroke-width="1.4" fill="none" marker-end="url(#am)"/>
+ <path d="M392,126 C426,126 434,184 472,186" stroke="#2F5BC4" stroke-width="1.5" fill="none" marker-end="url(#bl)"/>
+ <text class="ans" x="434" y="126" text-anchor="middle" fill="#5F6980" font-size="10" font-weight="600" letter-spacing="1">청취 맥락</text>
+
+ <rect x="478" y="26" width="136" height="52" rx="4" fill="rgba(201,138,16,.10)" stroke="rgba(201,138,16,.4)"/>
+ <text class="ph" x="546" y="58" text-anchor="middle" fill="#B98C2E" font-size="20" font-weight="700">?</text>
+ <text class="ans" x="546" y="47" text-anchor="middle" fill="#9A6A08" font-size="12.5" font-weight="600">장르를 가리킴</text>
+ <text class="ans" x="546" y="65" text-anchor="middle" fill="#9A6A08" font-size="10.5">성공</text>
+
+ <rect x="478" y="160" width="136" height="52" rx="4" fill="rgba(47,91,196,.08)" stroke="rgba(47,91,196,.35)"/>
+ <text class="ph" x="546" y="192" text-anchor="middle" fill="#6C8AD4" font-size="20" font-weight="700">?</text>
+ <text class="ans" x="546" y="181" text-anchor="middle" fill="#2F5BC4" font-size="12.5" font-weight="600">이 6곡을 가리킴</text>
+ <text class="ans" x="546" y="199" text-anchor="middle" fill="#2F5BC4" font-size="10.5">더 좋은 결과</text>
+</svg>`;
+
+const CARDS = [
+{ set:'a', kind:'구조 복원',
+  q:'음악과 이미지를 잇는 두 경로의 이름은?',
+  sub:'빈칸을 채우고, 화살표가 왜 양쪽 다인지도 말해봅니다.',
+  svg:SVG_A,
+  resp:{type:'blanks', label:'빈칸 채우기', items:[
+    {bl:'위쪽 경로', ans:['정서','감정','정서경로']},
+    {bl:'아래쪽 경로', ans:['문화','관습','문화코드','통념']}
+  ]},
+  back:`<h3>정답</h3>
+  <div class="pair">
+    <div class="pcell am"><div class="t">정서</div><div class="d">음악의 정서와 이미지의 정서가 맞물리는 길. 그 곡을 몰라도 통합니다.</div></div>
+    <div class="pcell bl"><div class="t">문화</div><div class="d">그 소재가 그 음악과 함께 쓰이는 것이 사람들에게 얼마나 통상적인가.</div></div>
+  </div>
+  <p>둘은 <b>같은 층위의 나란한 두 축</b>입니다. 어느 하나가 다른 하나의 준비 단계가 아닙니다.</p>
+  <p>양방향인 이유 — 곡을 들으면 이미지가 떠오르고, 이미지를 보면 곡이 떠오릅니다. 이 <span class="hl">왕복</span>이 커버의 목표입니다.</p>` },
+
+{ set:'a', kind:'판정',
+  q:'다음 둘은 각각 어느 축인가?',
+  sub:'① 느리고 단조인 곡이라 채도를 낮추고 어둡게 갔다 &nbsp;/&nbsp; ② 그 장르 커버가 늘 쓰던 체인과 그릴즈를 넣었다',
+  svg:'',
+  resp:{type:'choice', label:'고르기', correct:0, options:[
+    '① 정서 &nbsp;·&nbsp; ② 문화',
+    '① 문화 &nbsp;·&nbsp; ② 정서',
+    '둘 다 정서',
+    '둘 다 문화'
+  ]},
+  back:`<h3>정답</h3>
+  <p>① <span class="hl">정서</span> — 템포와 조성이 만드는 정서가 색의 축(채도 · 명도 · 색상)으로 옮겨간 것. 그 곡을 처음 듣는 사람에게도 작동합니다.</p>
+  <p>② <span class="hlb">문화</span> — 그 소재가 그 음악과 함께 쓰여온 축적. 아는 사람에게는 즉각적이지만, 모르는 사람에게는 아무것도 아닙니다.</p>
+  <p><b>가르는 질문</b> — 그 장르를 전혀 모르는 사람에게도 통하는가? 통하면 정서, 안 통하면 문화입니다.</p>` },
+
+{ set:'a', kind:'적용',
+  q:'지금 듣고 있는 곡 하나를 골라, 두 축의 재료를 하나씩 적어보라.',
+  sub:'머릿속으로 말고 실제로 한 줄씩. 30초.',
+  svg:'',
+  resp:{type:'free', label:'써보기', ph:'곡 / 정서 축 재료 / 문화 축 재료'},
+  back:`<h3>재료 목록</h3>
+  <div class="pair">
+    <div class="pcell"><div class="t">이미지 쪽</div><div class="d">사물 · 인물 · 분위기 · 타이포그래피 · 효과</div></div>
+    <div class="pcell"><div class="t">음악 쪽</div><div class="d">가사와 주제 · 음정과 템포</div></div>
+  </div>
+  <p>두 축이 <b>어긋나면 신호가 흩어지고, 겹치면 세집니다.</b> 방금 적은 두 줄이 같은 곳을 가리키고 있는지 확인해보세요.</p>
+  <p>겹치지 않는다면 그건 실패가 아니라 재료 선택이 아직 안 끝난 것입니다.</p>` },
+
+{ set:'b', kind:'구조 복원',
+  q:'조준 다이어그램을 복원하라.',
+  sub:'왼쪽 세 힘과 가운데 결과까지 네 칸. 오른쪽 두 갈래는 답 확인에서 봅니다.',
+  svg:SVG_B,
+  resp:{type:'blanks', label:'빈칸 채우기', items:[
+    {bl:'왼쪽 위', ans:['음향신호','음향','소리','템포조성','템포와조성']},
+    {bl:'왼쪽 가운데', ans:['소재가사','소재','가사','주제','소재와가사','소재주제']},
+    {bl:'왼쪽 아래', ans:['문화코드','문화','관습','장르관습']},
+    {bl:'가운데', ans:['강한신호','신호','왕복','강한시그널','신호가세다']}
+  ]},
+  back:`<h3>핵심</h3>
+  <p>세 힘이 한 방향으로 모이는 건 실패가 아니라 <span class="hl">신호가 세다</span>는 뜻입니다. 수렴 자체가 성과입니다.</p>
+  <p>오른쪽 두 갈래는 <b>성공 / 실패</b>가 아닙니다. 장르를 가리켜도 성공이고, 이 6곡까지 짚으면 더 좋은 결과입니다.</p>
+  <p>둘을 가르는 것은 <span class="hlb">청취 맥락의 해상도</span> — 누가 · 언제 · 어디서가 구체적일수록 지시 대상이 앨범 쪽으로 내려옵니다.</p>` },
+
+{ set:'b', kind:'판정',
+  q:'"클리셰는 피해야 한다" — 맞는가?',
+  sub:'맞다/틀리다로 끝내지 말고, 그럼 무엇을 피해야 하는지까지.',
+  svg:'',
+  resp:{type:'choice', label:'고르기', correct:1, options:[
+    '맞다. 진부한 표현은 피하고 새로운 시각언어를 찾아야 한다',
+    '틀리다. 코드는 정확히 맞추되, 특정 커버를 복사하는 것을 피한다',
+    '틀리다. 클리셰는 많이 쓸수록 인식이 빨라진다',
+    '경우에 따라 다르다. 장르마다 판단이 갈린다'
+  ]},
+  back:`<h3>정답</h3>
+  <p>틀립니다. 목표가 <b>왕복</b>이므로 공유된 코드를 정확히 맞추는 것이 곧 조준입니다. 남달라야 하는 게 아니라 정확해야 합니다.</p>
+  <p>다만 <b>코드를 쓰는 것</b>과 <b>특정 커버를 복사하는 것</b>은 다릅니다. 전자는 사람들이 공유하는 문법을 쓰는 것이고, 후자가 나오면 그 이미지는 코드가 아니라 <span class="hl">그 한 장</span>을 가리키게 됩니다.</p>
+  <p>그래서 레퍼런스는 스케치가 끝난 뒤에 엽니다. 결함을 알려줘도 복제된다는 것이 반복 재현된 실험 결과입니다.</p>` },
+
+{ set:'b', kind:'판정',
+  q:'기획문만 남에게 보여주고 곡 5개를 추천받았다. 0곡 / 2–3곡 / 5곡이 겹쳤다면 각각 무슨 뜻인가?',
+  sub:'세 경우를 각각 짝지어 봅니다.',
+  svg:'',
+  resp:{type:'match', label:'짝짓기',
+    opts:['빗나감','적정 해상도','장르까지'],
+    rows:[{ml:'0곡',c:0},{ml:'2–3곡',c:1},{ml:'5곡',c:2}]},
+  back:`<h3>정답</h3>
+  <p><b>0곡</b> — 조준이 빗나갔습니다. 형용사만 있고 상황이 없을 때 주로 이렇게 됩니다.</p>
+  <p><b>2–3곡</b> — 적정 해상도. 장르를 넘어 <span class="hlb">이 앨범</span> 쪽까지 내려온 상태입니다.</p>
+  <p><b>5곡</b> — 장르까지는 정확히 맞췄습니다. 성공이지만 더 좁힐 여지가 있습니다.</p>
+  <p>고칠 때의 교환 — 형용사 하나를 지우고 <b>구체적 상황 한 줄</b>을 넣습니다. 500자는 상한이지 목표가 아닙니다.</p>` }
+];
+
+let i=0, scores=new Array(CARDS.length).fill(null), revealed=false;
+let pick=null, matchPick={};
+
+const norm = t => (t||'').toLowerCase().replace(/[\s·,.\/\-–—()·"']/g,'');
+
+function respHTML(r){
+  if(!r) return '';
+  let inner='';
+  if(r.type==='blanks'){
+    inner = r.items.map((it,n)=>
+      `<div class="blank" id="bk${n}">
+         <span class="bl">${it.bl}</span>
+         <span class="with"><input id="in${n}" type="text" autocomplete="off" spellcheck="false" placeholder="?"><span class="mark" id="mk${n}"></span></span>
+       </div>`).join('');
+  } else if(r.type==='choice'){
+    inner = `<div class="opts">` + r.options.map((o,n)=>
+      `<button class="opt" id="op${n}" onclick="choose(${n})">${o}</button>`).join('') + `</div>`;
+  } else if(r.type==='match'){
+    inner = r.rows.map((row,n)=>
+      `<div class="mrow">
+         <span class="ml">${row.ml}</span>
+         <span class="mopts">${r.opts.map((o,m)=>
+           `<button class="mopt" id="m${n}_${m}" onclick="mchoose(${n},${m})">${o}</button>`).join('')}</span>
+       </div>`).join('');
+  } else if(r.type==='free'){
+    inner = `<textarea id="freeIn" placeholder="${r.ph}"></textarea>`;
+  }
+  return `<div class="resp"><div class="resplab">${r.label}</div>${inner}<p class="nudge" id="nudge">먼저 답을 적거나 골라보세요. 시도한 뒤에 봐야 남습니다.</p></div>`;
+}
+
+function render(){
+  const c=CARDS[i];
+  document.getElementById('rail').innerHTML=CARDS.map((_,n)=>
+    `<span class="pip ${n<i?'done':''} ${n===i?'now':''}"></span>`).join('');
+  document.getElementById('stage').innerHTML=`
+    <div class="card" id="card">
+      <div class="kind">
+        <span class="badge ${c.set}">${c.set.toUpperCase()}</span>
+        <span class="kindname">${c.kind}</span>
+        <span class="count">${i+1} / ${CARDS.length}</span>
+      </div>
+      <p class="q">${c.q}</p>
+      <p class="qsub">${c.sub}</p>
+      ${c.svg?`<figure>${c.svg}</figure>`:''}
+      ${respHTML(c.resp)}
+      <div class="back">${c.back}</div>
+      <div class="acts">
+        <button class="reveal" id="revealBtn" onclick="reveal()">답 확인</button>
+        ${i>0?'<button onclick="go(-1)">이전</button>':''}
+      </div>
+    </div>`;
+  revealed=false; pick=null; matchPick={};
+  document.getElementById('rate').style.display='none';
+  document.getElementById('summary').classList.remove('on');
+  const first=document.getElementById('in0')||document.getElementById('freeIn');
+  if(first) first.focus();
+}
+
+function choose(n){
+  if(revealed) return;
+  pick=n;
+  CARDS[i].resp.options.forEach((_,m)=>
+    document.getElementById('op'+m).classList.toggle('sel', m===n));
+  document.getElementById('nudge').classList.remove('on');
+}
+
+function mchoose(row,opt){
+  if(revealed) return;
+  matchPick[row]=opt;
+  CARDS[i].resp.opts.forEach((_,m)=>
+    document.getElementById('m'+row+'_'+m).classList.toggle('sel', m===opt));
+  document.getElementById('nudge').classList.remove('on');
+}
+
+function attempted(){
+  const r=CARDS[i].resp; if(!r) return true;
+  if(r.type==='blanks') return r.items.some((_,n)=>document.getElementById('in'+n).value.trim());
+  if(r.type==='choice') return pick!==null;
+  if(r.type==='match') return Object.keys(matchPick).length>0;
+  if(r.type==='free') return document.getElementById('freeIn').value.trim().length>0;
+  return true;
+}
+
+function grade(){
+  const r=CARDS[i].resp; if(!r) return;
+  if(r.type==='blanks'){
+    r.items.forEach((it,n)=>{
+      const el=document.getElementById('in'+n);
+      const ok=it.ans.some(a=>norm(a)===norm(el.value));
+      document.getElementById('bk'+n).classList.add(ok?'ok':'no');
+      const mk=document.getElementById('mk'+n);
+      mk.textContent = ok?'✓':'✗'; mk.className='mark '+(ok?'ok':'no');
+      if(!ok && !el.value.trim()) el.value = it.ans[0];
+      el.disabled=true;
+    });
+  } else if(r.type==='choice'){
+    r.options.forEach((_,m)=>{
+      const b=document.getElementById('op'+m); b.disabled=true;
+      b.classList.remove('sel');
+      if(m===r.correct) b.classList.add('right');
+      else if(m===pick) b.classList.add('wrong');
+    });
+  } else if(r.type==='match'){
+    r.rows.forEach((row,n)=>{
+      r.opts.forEach((_,m)=>{
+        const b=document.getElementById('m'+n+'_'+m); b.disabled=true;
+        b.classList.remove('sel');
+        if(m===row.c) b.classList.add('right');
+        else if(matchPick[n]===m) b.classList.add('wrong');
+      });
+    });
+  } else if(r.type==='free'){
+    document.getElementById('freeIn').disabled=true;
+  }
+}
+
+function reveal(){
+  if(revealed) return;
+  if(!attempted()){ document.getElementById('nudge').classList.add('on'); return; }
+  revealed=true;
+  grade();
+  document.getElementById('card').classList.add('revealed');
+  const b=document.getElementById('revealBtn');
+  b.textContent='어땠나요?'; b.disabled=true; b.style.opacity=.45;
+  document.getElementById('rate').style.display='flex';
+}
+
+function rate(v){
+  if(!revealed) return;
+  scores[i]=v;
+  if(i<CARDS.length-1){ i++; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else finish();
+}
+
+function go(d){ i=Math.max(0,i+d); render(); }
+
+function finish(){
+  const weak=scores.map((s,n)=>s===0?n+1:null).filter(Boolean);
+  const mid=scores.map((s,n)=>s===1?n+1:null).filter(Boolean);
+  const strong=scores.filter(s=>s===2).length;
+  document.getElementById('stage').innerHTML='';
+  document.getElementById('rate').style.display='none';
+  document.getElementById('hint').style.display='none';
+  const s=document.getElementById('summary');
+  s.innerHTML=`<h2>6장 끝</h2>
+    <ul>
+      <li>술술 나온 카드 <b>${strong}장</b></li>
+      <li>겨우 나온 카드 <b>${mid.length?mid.join(', ')+'번':'없음'}</b></li>
+      <li>막힌 카드 <b>${weak.length?weak.join(', ')+'번':'없음'}</b></li>
+    </ul>
+    <div class="plan">
+      <b>다시 볼 시점</b> — 막힌 카드는 오늘 안에 한 번 더, 겨우 나온 카드는 내일, 술술 나온 카드는 3일 뒤.
+      기록은 저장되지 않으니 번호만 메모해두세요.
+    </div>
+    <button onclick="restart()">처음부터 다시</button>`;
+  s.classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart(){
+  i=0; scores=new Array(CARDS.length).fill(null);
+  document.getElementById('hint').style.display='';
+  render();
+}
+
+document.addEventListener('keydown',e=>{
+  const typing = ['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
+  if(e.code==='Enter' && !revealed){ e.preventDefault(); reveal(); return; }
+  if(revealed && ['Digit1','Digit2','Digit3'].includes(e.code) && !typing){ rate(+e.code.slice(5)-1); return; }
+  if(e.code==='ArrowLeft' && !typing) go(-1);
+});
+
+render();
+</script>
+</body>
+</html>
